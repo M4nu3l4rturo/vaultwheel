@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #080810;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #080810; }
+::-webkit-scrollbar-thumb { background: rgba(240,180,41,0.4); border-radius: 3px; }
+
+/* Glass card */
+.glass-card {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(240, 180, 41, 0.12);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(240, 180, 41, 0.35);
+  box-shadow: 0 0 30px rgba(240,180,41,0.08), 0 20px 40px rgba(0,0,0,0.4);
+  transform: translateY(-2px);
+}
+
+/* Gold button */
+.btn-gold {
+  background: linear-gradient(135deg, #f0b429 0%, #d4a017 100%);
+  color: #080810;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(240,180,41,0.4);
+}
+
+.btn-gold:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Outline button */
+.btn-outline {
+  background: transparent;
+  color: #f0b429;
+  border: 1px solid rgba(240,180,41,0.4);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+  background: rgba(240,180,41,0.1);
+  border-color: #f0b429;
+}
+
+/* Input */
+.vault-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(240,180,41,0.2);
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 12px 16px;
+  width: 100%;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.vault-input:focus {
+  border-color: #f0b429;
+  box-shadow: 0 0 20px rgba(240,180,41,0.1);
+}
+
+.vault-input::placeholder {
+  color: #505070;
+}
+
+/* Rarity colors */
+.rarity-legendary { color: #f0b429; }
+.rarity-rare { color: #7c3aed; }
+.rarity-uncommon { color: #3b82f6; }
+.rarity-common { color: #6b7280; }
+
+/* Section gradient lines */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(240,180,41,0.3), transparent);
+  margin: 60px 0;
+}
+
+/* Animated counter */
+@keyframes countUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.count-up {
+  animation: countUp 0.5s ease-out;
+}

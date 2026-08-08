@@ -1,0 +1,54 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+from .core.database import engine, SessionLocal
+from .models import *  # Import all models to create tables
+from .core.database import Base
+from .routes import auth, vehicles, tokens, transactions, kyc, admin
+from .services.seed import seed_database
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Create all tables
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created")
+    
+    # Seed database
+    db = SessionLocal()
+    try:
+        seed_database(db)
+    finally:
+        db.close()
+    
+    yield
+    logger.info("Shutdown")
+
+app = FastAPI(
+    title="VaultWheel API",
+    description="Global Vehicle Tokenization Marketplace — RWA Platform",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(auth.router)
+app.include_router(vehicles.router)
+app.include_router(tokens.router)
+app.include_router(transactions.router)
+app.include_router(kyc.router)
+app.include_router(admin.router)
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "VaultWheel API v1.0.0"}

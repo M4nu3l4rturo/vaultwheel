@@ -1,0 +1,60 @@
+# zerops.yaml — VaultWheel
+# Proyecto Zerops: python-hello-world-small-prod
+# Servicios existentes: app (Python) | db (PostgreSQL)
+# Servicio pendiente: frontend (crear en dashboard como Nginx)
+
+zerops:
+  # ─────────────────────────────────────────────────────────
+  # BACKEND — FastAPI (Python 3.12)
+  # Hostname en Zerops: app
+  # ─────────────────────────────────────────────────────────
+  - setup: app
+    build:
+      base: python@3.12
+      buildCommands:
+        - pip install --upgrade pip
+        - pip install -r backend/requirements.txt
+      deployFiles:
+        - backend
+        - zerops.yaml
+      cache:
+        - ~/.cache/pip~backend/requirements.txt
+
+    run:
+      base: python@3.12
+      ports:
+        - port: 8000
+          httpSupport: true
+      prepareCommands:
+        - chmod +x /var/www/backend/start.sh
+      start: cd /var/www && uvicorn backend.main:app --host 0.0.0.0 --port 8000
+      readinessCheck:
+        httpGet:
+          port: 8000
+          path: /health
+      envVariables:
+        DEMO_MODE: "true"
+        POLYGON_RPC_URL: "https://rpc-amoy.polygon.technology"
+
+  # ─────────────────────────────────────────────────────────
+  # FRONTEND — React/Vite → Nginx Static
+  # Hostname en Zerops: frontend
+  # (Crear en dashboard: Add service → Nginx → hostname: frontend)
+  # ─────────────────────────────────────────────────────────
+  - setup: frontend
+    build:
+      base: nodejs@20
+      buildCommands:
+        - cd frontend && npm install && npm run build
+      deployFiles:
+        - frontend/dist
+        - frontend/nginx.conf
+      cache:
+        - frontend/node_modules~frontend/package-lock.json
+
+    run:
+      base: nginx@1.22
+      ports:
+        - port: 80
+          httpSupport: true
+      start: nginx -g 'daemon off;' -c /var/www/nginx.conf
