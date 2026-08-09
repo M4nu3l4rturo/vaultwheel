@@ -8,18 +8,20 @@ zerops:
       base: python@3.12
       buildCommands:
         - pip install --upgrade pip
-        - pip install --break-system-packages --target /usr/lib/python3/dist-packages -r backend/requirements.txt
+        - pip install --target=./vendor -r backend/requirements.txt
       deployFiles:
         - backend
+        - vendor
         - zerops.yaml
-        - /usr/lib/python3/dist-packages
+      cache:
+        - ~/.cache/pip~backend/requirements.txt
 
     run:
       base: python@3.12
       ports:
         - port: 8000
           httpSupport: true
-      start: python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
+      start: PYTHONPATH=/var/www/vendor:/var/www/backend:/var/www python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
       readinessCheck:
         httpGet:
           port: 8000
@@ -27,6 +29,7 @@ zerops:
       envVariables:
         DEMO_MODE: "true"
         POLYGON_RPC_URL: "https://rpc-amoy.polygon.technology"
+        PYTHONPATH: "/var/www/vendor:/var/www/backend:/var/www"
 
   # ─────────────────────────────────────────────────────────
   # FRONTEND — React/Vite → Nginx Static
