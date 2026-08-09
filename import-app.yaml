@@ -1,0 +1,5 @@
+project:
+  name: python-hello-world-small-prod
+  services:
+    - hostname: app
+      type: python@3.12

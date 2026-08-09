@@ -8,22 +8,21 @@ zerops:
       base: python@3.12
       buildCommands:
         - pip install --upgrade pip
-        - pip install -r backend/requirements.txt
+        - pip install --target=./vendor -r backend/requirements.txt
       deployFiles:
         - backend
+        - vendor
+        - main.py
         - zerops.yaml
-      addToRunPrepare:
-        - backend/requirements.txt
+      cache:
+        - ~/.cache/pip~backend/requirements.txt
 
     run:
       base: python@3.12
       ports:
         - port: 8000
           httpSupport: true
-      prepareCommands:
-        - pip install --upgrade pip
-        - pip install -r backend/requirements.txt
-      start: python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
+      start: python3 main.py
       readinessCheck:
         httpGet:
           port: 8000
