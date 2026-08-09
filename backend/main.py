@@ -1,4 +1,9 @@
 import sys, os
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import logging
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 try:
@@ -11,21 +16,23 @@ except (ImportError, ValueError):
     from models import *
     from routes import auth, vehicles, tokens, transactions, kyc, admin, holdings, payments, market
     from services.seed import seed_database
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
-    logger.info("Database tables created")
-    
-    db = SessionLocal()
     try:
-        seed_database(db)
-    finally:
-        db.close()
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables created")
+        
+        db = SessionLocal()
+        try:
+            seed_database(db)
+        finally:
+            db.close()
+    except Exception as e:
+        logger.error(f"Lifespan setup error (DB fallback): {e}")
     
     yield
     logger.info("Shutdown")
