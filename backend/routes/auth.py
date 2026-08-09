@@ -6,7 +6,7 @@ from ..core.database import get_db
 from ..core.config import settings
 from ..core.security import verify_password, get_password_hash, create_access_token, decode_token
 from ..models.user import User, KYCStatus
-from ..schemas.user import UserCreate, UserResponse, AuthResponse, UserUpdate
+from ..schemas.user import UserCreate, UserLogin, UserResponse, AuthResponse, UserUpdate
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
@@ -54,7 +54,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     return {"access_token": access_token, "token_type": "bearer", "user": new_user}
 
 @router.post("/login", response_model=AuthResponse)
-def login_json(user_in: UserCreate, db: Session = Depends(get_db)):
+def login_json(user_in: UserLogin, db: Session = Depends(get_db)):
     """JSON login endpoint — accepts {email, password} body (used by frontend)"""
     user = db.query(User).filter(User.email == user_in.email).first()
     if not user or not verify_password(user_in.password, user.password_hash):

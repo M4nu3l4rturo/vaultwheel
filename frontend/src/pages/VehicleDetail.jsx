@@ -40,10 +40,15 @@ export default function VehicleDetail() {
     )
   }
 
-  if (!vehicle) return null
+  if (!rawVehicle) return null
 
-  const { token, passport_data, custom_features } = vehicle
-  const percentAvailable = Math.round((token.available_supply / token.total_supply) * 100)
+  const vData = rawVehicle.vehicle || rawVehicle
+  const token = rawVehicle.token || vData.token || {}
+  const passport_data = vData.passport_data
+  const custom_features = vData.custom_features
+  const availableSupply = token.available_supply || 0
+  const totalSupply = token.total_supply || 1
+  const percentAvailable = Math.round((availableSupply / totalSupply) * 100)
 
   return (
     <div className="min-h-screen bg-vault-dark pt-8 pb-24">
@@ -63,14 +68,14 @@ export default function VehicleDetail() {
           >
             <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-vault-border glass-card p-2">
               <img 
-                src={vehicle.images?.[0] || 'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&q=80'} 
-                alt={`${vehicle.make} ${vehicle.model}`}
+                src={vData.images?.[0] || 'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&q=80'} 
+                alt={`${vData.make} ${vData.model}`}
                 className="w-full h-full object-cover rounded-xl"
               />
             </div>
-            {vehicle.images && vehicle.images.length > 1 && (
+            {vData.images && vData.images.length > 1 && (
               <div className="grid grid-cols-4 gap-4">
-                {vehicle.images.slice(1).map((img, i) => (
+                {vData.images.slice(1).map((img, i) => (
                   <div key={i} className="aspect-square rounded-lg overflow-hidden border border-vault-border opacity-60 hover:opacity-100 cursor-pointer transition-opacity">
                     <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
                   </div>
@@ -89,9 +94,9 @@ export default function VehicleDetail() {
               <div>
                 <div className="flex items-center space-x-3 mb-2">
                   <span className="bg-vault-card border border-vault-border px-3 py-1 rounded-full text-xs font-bold text-vault-text tracking-widest uppercase">
-                    {vehicle.make}
+                    {vData.make}
                   </span>
-                  {vehicle.verification_status === 'APPROVED' && (
+                  {vData.verification_status === 'APPROVED' && (
                     <span className="flex items-center space-x-1 text-green-400 text-xs font-bold bg-green-500/10 px-3 py-1 rounded-full border border-green-500/30">
                       <ShieldCheck size={14} />
                       <span>VERIFIED</span>
@@ -99,17 +104,17 @@ export default function VehicleDetail() {
                   )}
                 </div>
                 <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">
-                  {vehicle.model}
+                  {vData.model}
                 </h1>
-                <p className="text-xl text-vault-text mt-2">{vehicle.year}</p>
+                <p className="text-xl text-vault-text mt-2">{vData.year}</p>
               </div>
               <div className="shrink-0 ml-4 hidden sm:block">
-                <RarityMeter score={vehicle.rarity_score} />
+                <RarityMeter score={vData.rarity_score} />
               </div>
             </div>
 
             <div className="sm:hidden mb-8 flex justify-center">
-              <RarityMeter score={vehicle.rarity_score} />
+              <RarityMeter score={vData.rarity_score} />
             </div>
 
             <div className="glass-card p-6 md:p-8 space-y-6 flex-1 flex flex-col justify-between">
@@ -117,7 +122,7 @@ export default function VehicleDetail() {
                 <div>
                   <div className="text-sm text-vault-text mb-1">Total Valuation</div>
                   <div className="text-3xl font-bold text-vault-gold">
-                    ${vehicle.total_valuation?.toLocaleString()}
+                    ${vData.total_valuation?.toLocaleString()}
                   </div>
                 </div>
                 <div>
@@ -131,7 +136,7 @@ export default function VehicleDetail() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-vault-text">Token Availability</span>
-                  <span className="font-bold">{token.available_supply} / {token.total_supply}</span>
+                  <span className="font-bold">{availableSupply} / {totalSupply}</span>
                 </div>
                 <div className="w-full h-2 bg-vault-dark rounded-full overflow-hidden">
                   <div 
@@ -144,6 +149,7 @@ export default function VehicleDetail() {
                   <span>{100 - percentAvailable}% Funded</span>
                 </div>
               </div>
+
 
               <button 
                 onClick={() => {
@@ -181,7 +187,7 @@ export default function VehicleDetail() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 max-w-3xl">
                 <h3 className="text-2xl font-bold text-white mb-4">Vehicle History & Overview</h3>
                 <p className="text-vault-text text-lg leading-relaxed whitespace-pre-line">
-                  {vehicle.description}
+                  {vData.description}
                 </p>
                 <div className="bg-blue-500/10 border border-blue-500/30 p-4 rounded-xl flex space-x-3 items-start mt-8">
                   <Info className="text-blue-400 shrink-0 mt-1" />
@@ -234,7 +240,7 @@ export default function VehicleDetail() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-12">
                   <div className="shrink-0 text-center">
-                    <RarityMeter score={vehicle.rarity_score} />
+                    <RarityMeter score={vData.rarity_score} />
                     <div className="mt-6">
                       <span className="text-vault-text text-sm block mb-1">Production Units</span>
                       <span className="text-3xl font-black text-white">{passport_data?.production_units}</span>
@@ -263,8 +269,9 @@ export default function VehicleDetail() {
       <BuyModal 
         isOpen={buyModalOpen} 
         onClose={() => setBuyModalOpen(false)} 
-        vehicle={vehicle} 
+        vehicle={{ ...vData, token }} 
       />
+
     </div>
   )
 }

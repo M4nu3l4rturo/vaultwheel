@@ -115,3 +115,11 @@ body {
 .count-up {
   animation: countUp 0.5s ease-out;
 }
+
+/* Shimmer Effect */
+.shimmer-bg {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(240,180,41,0.12) 50%, rgba(255,255,255,0.03) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+}
+

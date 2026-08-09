@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
-export default function VehicleCard({ vehicle }) {
-  const { token, rarity_score } = vehicle
+export default function VehicleCard({ vehicle: item }) {
+  const v = item.vehicle || item
+  const token = item.token || v.token || {}
+  const rarity_score = v.rarity_score || 0
 
   const getRarityColor = (score) => {
     if (score >= 90) return 'text-vault-gold border-vault-gold shadow-[0_0_10px_rgba(240,180,41,0.5)]'
@@ -18,7 +20,9 @@ export default function VehicleCard({ vehicle }) {
     return 'COLLECTOR'
   }
 
-  const percentAvailable = Math.round((token.available_supply / token.total_supply) * 100)
+  const totalSupply = token.total_supply || 1
+  const availableSupply = token.available_supply || 0
+  const percentAvailable = Math.round((availableSupply / totalSupply) * 100)
 
   return (
     <motion.div 
@@ -27,8 +31,8 @@ export default function VehicleCard({ vehicle }) {
     >
       <div className="relative aspect-video overflow-hidden">
         <img 
-          src={vehicle.images?.[0] || 'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&q=80'} 
-          alt={vehicle.model}
+          src={v.images?.[0] || 'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&q=80'} 
+          alt={v.model}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute top-4 right-4 bg-vault-dark/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold tracking-wider border ${getRarityColor(rarity_score)}">
@@ -40,12 +44,12 @@ export default function VehicleCard({ vehicle }) {
         <div className="flex justify-between items-start mb-4">
           <div>
             <h3 className="text-xl font-bold text-white group-hover:text-vault-gold transition-colors">
-              {vehicle.make} {vehicle.model}
+              {v.make} {v.model}
             </h3>
-            <p className="text-vault-text text-sm">{vehicle.year}</p>
+            <p className="text-vault-text text-sm">{v.year}</p>
           </div>
           <div className="text-right">
-            <div className="text-lg font-bold text-vault-gold">${vehicle.total_valuation?.toLocaleString()}</div>
+            <div className="text-lg font-bold text-vault-gold">${v.total_valuation?.toLocaleString()}</div>
             <div className="text-xs text-vault-text">Valuation</div>
           </div>
         </div>
@@ -57,7 +61,7 @@ export default function VehicleCard({ vehicle }) {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-vault-text">Available Tokens</span>
-            <span className="font-semibold">{token.available_supply} / {token.total_supply}</span>
+            <span className="font-semibold">{availableSupply} / {totalSupply}</span>
           </div>
           
           <div className="w-full h-1.5 bg-vault-dark rounded-full overflow-hidden mt-2">
@@ -71,7 +75,7 @@ export default function VehicleCard({ vehicle }) {
           </div>
         </div>
 
-        <Link to={`/vehicles/${vehicle.id}`} className="block w-full">
+        <Link to={`/vehicles/${v.id}`} className="block w-full">
           <button className="btn-outline w-full py-3 mt-auto">
             View Passport
           </button>
@@ -80,3 +84,4 @@ export default function VehicleCard({ vehicle }) {
     </motion.div>
   )
 }
+

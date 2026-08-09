@@ -2,33 +2,54 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { Wallet, ArrowRight, ExternalLink } from 'lucide-react'
-import { getMyHoldings, getMyTransactions } from '../services/api'
+import { Tag, Trash2 } from 'lucide-react'
+import { getMyHoldings, getMyTransactions, getMyListings, cancelListing } from '../services/api'
+import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 import { getPolygonAmoyExplorerUrl } from '../services/web3'
+import DepositModal from '../components/DepositModal'
+import SellModal from '../components/SellModal'
 
 export default function Portfolio() {
   const { user } = useAuth()
   const [holdings, setHoldings] = useState([])
   const [transactions, setTransactions] = useState([])
+  const [myListings, setMyListings] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showDeposit, setShowDeposit] = useState(false)
+  const [sellingHolding, setSellingHolding] = useState(null)
+
+  const fetchData = async () => {
+    try {
+      const [hRes, tRes, lRes] = await Promise.all([
+        getMyHoldings(),
+        getMyTransactions(),
+        getMyListings()
+      ])
+      setHoldings(hRes.data)
+      setTransactions(tRes.data)
+      setMyListings(lRes.data)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCancelListing = async (listingId) => {
+    try {
+      await cancelListing(listingId)
+      toast.success('Listing cancelled successfully')
+      fetchData()
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'Failed to cancel listing')
+    }
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [hRes, tRes] = await Promise.all([
-          getMyHoldings(),
-          getMyTransactions()
-        ])
-        setHoldings(hRes.data)
-        setTransactions(tRes.data)
-      } catch (e) {
-        console.error(e)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchData()
   }, [])
+
 
   const totalPortfolioValue = holdings.reduce((sum, item) => {
     return sum + (item.quantity * item.vehicle.token.price_per_token)
@@ -78,7 +99,12 @@ export default function Portfolio() {
               <div className="text-4xl md:text-5xl font-black text-vault-gold">
                 ${user?.fiat_balance?.toLocaleString()}
               </div>
-              <button className="mt-6 btn-outline text-xs px-4 py-2">Deposit Funds (Demo)</button>
+              <button 
+                onClick={() => setShowDeposit(true)}
+                className="mt-6 btn-outline text-xs px-4 py-2"
+              >
+                Deposit Funds (Demo)
+              </button>
             </div>
           </div>
         </div>
@@ -122,7 +148,9 @@ export default function Portfolio() {
                     <div className="grid grid-cols-2 gap-4 text-sm bg-vault-dark p-3 rounded-lg border border-vault-border/50">
                       <div>
                         <div className="text-vault-text">Tokens Owned</div>
-                        <div className="font-bold text-white">{item.quantity}</div>
+                        <div className="font-bold text-white">
+                          {item.quantity} {item.locked_quantity > 0 && <span className="text-xs text-vault-gold ml-1">({item.locked_quantity} listed)</span>}
+                        </div>
                       </div>
                       <div>
                         <div className="text-vault-text">Current Value</div>
@@ -131,10 +159,61 @@ export default function Portfolio() {
                         </div>
                       </div>
                     </div>
+                    <button 
+                      onClick={() => setSellingHolding(item)}
+                      disabled={item.quantity - (item.locked_quantity || 0) <= 0}
+                      className="mt-4 w-full border border-vault-gold text-vault-gold hover:bg-vault-gold hover:text-vault-dark font-medium py-2 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {item.quantity - (item.locked_quantity || 0) <= 0 ? 'All Tokens Listed' : 'List for Sale'}
+                    </button>
                   </div>
                 </div>
               </motion.div>
             ))}
+          </div>
+        )}
+
+        {/* My Active Listings */}
+        {myListings && myListings.length > 0 && (
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold mb-6 flex items-center">
+              <Tag className="mr-2 text-vault-gold" size={24} />
+              My Active Listings (Secondary Market)
+            </h2>
+            <div className="glass-card overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-vault-card/50 border-b border-vault-border">
+                      <th className="p-4 text-vault-text font-medium text-sm">Asset</th>
+                      <th className="p-4 text-vault-text font-medium text-sm">Quantity</th>
+                      <th className="p-4 text-vault-text font-medium text-sm">Price / Token</th>
+                      <th className="p-4 text-vault-text font-medium text-sm">Total Value</th>
+                      <th className="p-4 text-vault-text font-medium text-sm">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-vault-border">
+                    {myListings.map((l) => (
+                      <tr key={l.id} className="hover:bg-vault-card/30 transition-colors">
+                        <td className="p-4 font-medium text-white">{l.vehicle?.make} {l.vehicle?.model}</td>
+                        <td className="p-4">{l.quantity} {l.vehicle?.token_symbol}</td>
+                        <td className="p-4 text-vault-gold font-bold">${l.price_per_token?.toLocaleString()}</td>
+                        <td className="p-4 text-green-400 font-bold">${(l.quantity * l.price_per_token)?.toLocaleString()}</td>
+                        <td className="p-4">
+                          <button
+                            onClick={() => handleCancelListing(l.id)}
+                            className="flex items-center space-x-1 text-xs text-red-400 hover:text-red-300 border border-red-500/30 bg-red-500/10 px-3 py-1.5 rounded transition-colors"
+                          >
+                            <Trash2 size={14} />
+                            <span>Cancel Listing</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
 
@@ -194,6 +273,27 @@ export default function Portfolio() {
         </div>
 
       </div>
+
+      {showDeposit && (
+        <DepositModal 
+          onClose={() => setShowDeposit(false)} 
+          onSuccess={() => {
+            setShowDeposit(false)
+            fetchData()
+          }} 
+        />
+      )}
+
+      {sellingHolding && (
+        <SellModal 
+          holding={sellingHolding} 
+          onClose={() => setSellingHolding(null)} 
+          onSuccess={() => {
+            setSellingHolding(null)
+            fetchData()
+          }} 
+        />
+      )}
     </div>
   )
 }

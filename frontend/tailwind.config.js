@@ -23,6 +23,7 @@ export default {
         'float': 'float 6s ease-in-out infinite',
         'pulse-gold': 'pulseGold 2s ease-in-out infinite',
         'fade-in': 'fadeIn 0.6s ease-out',
+        'shimmer': 'shimmer 2s linear infinite',
       },
       keyframes: {
         float: {
@@ -36,8 +37,13 @@ export default {
         fadeIn: {
           '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
         }
       }
+
     }
   },
   plugins: [],

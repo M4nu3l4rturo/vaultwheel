@@ -1,31 +1,48 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List
-from ..core.database import get_db
+from ..core.database import get_db, SessionLocal
 from ..models.user import User, KYCStatus
 from ..models.token import VehicleToken
-from ..models.transaction import Transaction, TransactionStatus
+from ..models.transaction import Transaction, TransactionStatus, TransactionType
 from ..models.holding import UserHolding
 from ..schemas.transaction import BuyRequest, TransactionResponse
 from ..services.web3_service import mint_vehicle_tokens
 from .auth import get_current_user
 import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/transactions", tags=["transactions"])
 
-def process_minting(to_address: str, vehicle_token_id: int, quantity: int, user_id: int, token_id: int, tx_id: int, db: Session):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    tx_hash, nft_id = loop.run_until_complete(mint_vehicle_tokens(to_address, vehicle_token_id, quantity, user_id, token_id))
-    
-    # Update transaction
-    tx = db.query(Transaction).filter(Transaction.id == tx_id).first()
-    if tx:
-        tx.tx_hash = tx_hash
-        tx.nft_token_id = nft_id
-        tx.status = TransactionStatus.CONFIRMED
-        db.commit()
-    loop.close()
+def process_minting(to_address: str, vehicle_token_id: int, quantity: int, user_id: int, token_id: int, tx_id: int):
+    """Background task to mint NFT tokens. Uses its own DB session."""
+    db = SessionLocal()
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        tx_hash, nft_id = loop.run_until_complete(
+            mint_vehicle_tokens(to_address, vehicle_token_id, quantity, user_id, token_id)
+        )
+        
+        # Update transaction with blockchain result
+        tx = db.query(Transaction).filter(Transaction.id == tx_id).first()
+        if tx:
+            tx.tx_hash = tx_hash
+            tx.nft_token_id = nft_id
+            tx.status = TransactionStatus.CONFIRMED
+            db.commit()
+            logger.info(f"Transaction {tx_id} confirmed with tx_hash: {tx_hash}")
+        loop.close()
+    except Exception as e:
+        logger.error(f"Minting failed for transaction {tx_id}: {e}")
+        tx = db.query(Transaction).filter(Transaction.id == tx_id).first()
+        if tx:
+            tx.status = TransactionStatus.FAILED
+            db.commit()
+    finally:
+        db.close()
 
 @router.post("/buy", response_model=TransactionResponse)
 def buy_tokens(
@@ -56,7 +73,8 @@ def buy_tokens(
         quantity=req.quantity,
         price_at_purchase=token.price_per_token,
         total_amount=total_cost,
-        status=TransactionStatus.PENDING
+        status=TransactionStatus.PENDING,
+        transaction_type=TransactionType.PRIMARY_BUY
     )
     db.add(tx)
     
@@ -88,7 +106,7 @@ def buy_tokens(
     db.commit()
     db.refresh(tx)
     
-    # Trigger background mint
+    # Trigger background mint (uses its own SessionLocal)
     to_address = current_user.wallet_address or ""
     background_tasks.add_task(
         process_minting, 
@@ -97,12 +115,11 @@ def buy_tokens(
         req.quantity, 
         current_user.id, 
         token.id, 
-        tx.id, 
-        Session(db.get_bind())
+        tx.id
     )
     
     return tx
 
 @router.get("/me", response_model=List[TransactionResponse])
 def get_my_transactions(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return db.query(Transaction).filter(Transaction.buyer_id == current_user.id).all()
+    return db.query(Transaction).filter(Transaction.buyer_id == current_user.id).order_by(Transaction.created_at.desc()).all()

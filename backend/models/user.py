@@ -29,6 +29,6 @@ class User(Base):
     wallet_address = Column(String(42), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
-    transactions = relationship("Transaction", back_populates="buyer")
+    transactions = relationship("Transaction", foreign_keys="[Transaction.buyer_id]", back_populates="buyer")
     holdings = relationship("UserHolding", back_populates="user")
     vehicles = relationship("Vehicle", back_populates="seller")

@@ -22,3 +22,13 @@ export const getMyTransactions = () => api.get('/api/transactions/me')
 
 // Holdings
 export const getMyHoldings = () => api.get('/api/holdings/me')
+
+// Payments
+export const depositFunds = (data) => api.post('/api/payments/deposit', data)
+
+// Market
+export const createListing = (data) => api.post('/api/market/list', data)
+export const getActiveListings = () => api.get('/api/market')
+export const getMyListings = () => api.get('/api/market/my-listings')
+export const cancelListing = (listingId) => api.delete(`/api/market/${listingId}`)
+export const buyListing = (listingId) => api.post(`/api/market/buy/${listingId}`)
