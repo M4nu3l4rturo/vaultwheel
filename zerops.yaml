@@ -12,15 +12,15 @@ zerops:
       deployFiles:
         - backend
         - zerops.yaml
-      cache:
-        - ~/.cache/pip~backend/requirements.txt
 
     run:
       base: python@3.12
       ports:
         - port: 8000
           httpSupport: true
-      start: /home/zerops/.local/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000
+      prepareCommands:
+        - pip install -r backend/requirements.txt
+      start: python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
       readinessCheck:
         httpGet:
           port: 8000
@@ -41,8 +41,6 @@ zerops:
       deployFiles:
         - frontend/dist/
         - nginx.conf
-      cache:
-        - frontend/node_modules~frontend/package-lock.json
 
     run:
       base: nginx@1.22
