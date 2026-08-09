@@ -31,6 +31,7 @@ zerops:
           port: 8000
           path: /health
       envVariables:
+        DATABASE_URL: "postgresql://vaultwheel:vaultwheel@db:5432/vaultwheel"
         DEMO_MODE: "true"
         POLYGON_RPC_URL: "https://rpc-amoy.polygon.technology"
 
