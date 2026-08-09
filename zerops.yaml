@@ -27,7 +27,7 @@ zerops:
           httpSupport: true
       start: python3 main.py
       envVariables:
-        DATABASE_URL: "postgresql://vaultwheel:vaultwheel@db:5432/vaultwheel"
+        DATABASE_URL: "postgresql://${db_user}:${db_password}@${db_hostname}:${db_port}/${db_database}"
         DEMO_MODE: "true"
         POLYGON_RPC_URL: "https://rpc-amoy.polygon.technology"
         PYTHONDONTWRITEBYTECODE: "1"
