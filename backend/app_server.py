@@ -1,29 +1,21 @@
 import sys
 import os
-import builtins
 from contextlib import asynccontextmanager
 
-builtins.asynccontextmanager = asynccontextmanager
+# Asegura que el directorio actual (backend/) esté en sys.path
+base_dir = os.path.dirname(os.path.abspath(__file__))
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import uvicorn
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-if base_dir not in sys.path:
-    sys.path.insert(0, base_dir)
-
-try:
-    from core.database import engine, SessionLocal, Base
-    from models import *
-    from routes import auth, vehicles, tokens, transactions, kyc, admin, holdings, payments, market
-    from services.seed import seed_database
-except (ImportError, ValueError):
-    from .core.database import engine, SessionLocal, Base
-    from .models import *
-    from .routes import auth, vehicles, tokens, transactions, kyc, admin, holdings, payments, market
-    from .services.seed import seed_database
+from core.database import engine, SessionLocal, Base
+from models import *
+from routes import auth, vehicles, tokens, transactions, kyc, admin, holdings, payments, market
+from services.seed import seed_database
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
