@@ -1,6 +1,10 @@
 import sys
 import os
+import builtins
 from contextlib import asynccontextmanager
+
+builtins.asynccontextmanager = asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging

@@ -1,5 +1,9 @@
 import sys
 import os
+import builtins
+from contextlib import asynccontextmanager
+
+builtins.asynccontextmanager = asynccontextmanager
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 backend_dir = os.path.join(base_dir, 'backend')
