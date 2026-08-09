@@ -1,7 +1,8 @@
 zerops:
   # BACKEND — FastAPI (Python 3.12)
   # Hostname en Zerops: app
-  - setup: app    build:
+  - setup: app
+    build:
       base: python@3.12
       buildCommands:
         - pip install --upgrade pip
