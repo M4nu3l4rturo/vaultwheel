@@ -12,6 +12,7 @@ zerops:
       deployFiles:
         - backend
         - main.py
+        - uvicorn.py
         - zerops.yaml
       cache:
         - ~/.cache/pip~backend/requirements.txt
@@ -22,11 +23,8 @@ zerops:
         - port: 8000
           httpSupport: true
       prepareCommands:
-        - rm -f /var/www/uvicorn.py /var/www/sitecustomize.py
         - pip install --upgrade pip
         - pip install -r backend/requirements.txt
-      initCommands:
-        - rm -f /var/www/uvicorn.py /var/www/sitecustomize.py
       start: python3 main.py
       readinessCheck:
         httpGet:
