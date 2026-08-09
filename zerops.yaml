@@ -11,7 +11,7 @@ zerops:
         - pip install -r backend/requirements.txt
       deployFiles:
         - backend
-        - uvicorn.py
+        - uvicorn
         - zerops.yaml
 
     run:
