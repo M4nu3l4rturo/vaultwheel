@@ -9,6 +9,8 @@ zerops:
       buildCommands:
         - pip install --upgrade pip
         - pip install -r backend/requirements.txt
+        - cp /home/zerops/.local/bin/uvicorn /usr/local/bin/uvicorn || true
+        - cp /home/zerops/.local/bin/uvicorn /usr/bin/uvicorn || true
       deployFiles:
         - backend
         - zerops.yaml
@@ -20,6 +22,10 @@ zerops:
       ports:
         - port: 8000
           httpSupport: true
+      prepareCommands:
+        - pip install -r backend/requirements.txt
+        - cp /home/zerops/.local/bin/uvicorn /usr/local/bin/uvicorn || true
+        - cp /home/zerops/.local/bin/uvicorn /usr/bin/uvicorn || true
       start: python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
       readinessCheck:
         httpGet:
@@ -40,6 +46,7 @@ zerops:
         - cd frontend && npm install && npm run build
       deployFiles:
         - frontend/dist/
+        - frontend/nginx.conf
       cache:
         - frontend/node_modules~frontend/package-lock.json
 
@@ -48,3 +55,4 @@ zerops:
       ports:
         - port: 80
           httpSupport: true
+      start: nginx -g 'daemon off;' -c /var/www/nginx.conf
