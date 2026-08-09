@@ -1,11 +1,16 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-from .core.database import engine, SessionLocal
-from .models import *
-from .core.database import Base
-from .routes import auth, vehicles, tokens, transactions, kyc, admin, holdings, payments, market
-from .services.seed import seed_database
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+try:
+    from .core.database import engine, SessionLocal, Base
+    from .models import *
+    from .routes import auth, vehicles, tokens, transactions, kyc, admin, holdings, payments, market
+    from .services.seed import seed_database
+except (ImportError, ValueError):
+    from core.database import engine, SessionLocal, Base
+    from models import *
+    from routes import auth, vehicles, tokens, transactions, kyc, admin, holdings, payments, market
+    from services.seed import seed_database
 import logging
 
 logging.basicConfig(level=logging.INFO)
