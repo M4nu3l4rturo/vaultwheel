@@ -7,8 +7,8 @@ zerops:
     build:
       base: python@3.12
       buildCommands:
-        - python3 -m pip install --upgrade pip
-        - python3 -m pip install -r backend/requirements.txt
+        - pip install --upgrade pip
+        - pip install -r backend/requirements.txt
       deployFiles:
         - backend
         - zerops.yaml
@@ -20,9 +20,7 @@ zerops:
       ports:
         - port: 8000
           httpSupport: true
-      prepareCommands:
-        - python3 -m pip install -r backend/requirements.txt
-      start: python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
+      start: PYTHONPATH=/home/zerops/.local/lib/python3.12/site-packages:/var/www python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
       readinessCheck:
         httpGet:
           port: 8000
@@ -30,6 +28,7 @@ zerops:
       envVariables:
         DEMO_MODE: "true"
         POLYGON_RPC_URL: "https://rpc-amoy.polygon.technology"
+        PYTHONPATH: "/home/zerops/.local/lib/python3.12/site-packages:/var/www"
 
   # ─────────────────────────────────────────────────────────
   # FRONTEND — React/Vite → Nginx Static
@@ -39,10 +38,9 @@ zerops:
     build:
       base: nodejs@20
       buildCommands:
-        - cd frontend && npm install && npm run build
+        - cd frontend && npm install && npm run build && cp public/nginx.conf dist/nginx.conf
       deployFiles:
         - frontend/dist/
-        - frontend/public/nginx.conf
       cache:
         - frontend/node_modules~frontend/package-lock.json
 
