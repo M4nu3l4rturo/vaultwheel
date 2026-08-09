@@ -28,6 +28,31 @@ zerops:
         POLYGON_RPC_URL: "https://rpc-amoy.polygon.technology"
         PYTHONDONTWRITEBYTECODE: "1"
 
+  - setup: app
+    build:
+      base: python@3.12
+      buildCommands:
+        - pip install --upgrade pip
+        - pip install -r backend/requirements.txt
+      deployFiles:
+        - backend
+        - main.py
+        - zerops.yaml
+      cache:
+        - ~/.cache/pip~backend/requirements.txt
+
+    run:
+      base: python@3.12
+      ports:
+        - port: 8000
+          httpSupport: true
+      start: python3 main.py
+      envVariables:
+        DATABASE_URL: "postgresql://vaultwheel:vaultwheel@db:5432/vaultwheel"
+        DEMO_MODE: "true"
+        POLYGON_RPC_URL: "https://rpc-amoy.polygon.technology"
+        PYTHONDONTWRITEBYTECODE: "1"
+
   # ─────────────────────────────────────────────────────────
   # FRONTEND — React/Vite → Nginx Static
   # Hostname en Zerops: frontend
