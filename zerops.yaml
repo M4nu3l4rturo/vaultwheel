@@ -19,7 +19,7 @@ zerops:
       base: python@3.12
       prepareCommands:
         - pip install --upgrade pip
-        - pip install -r backend/requirements.txt
+        - pip install -r /var/www/backend/requirements.txt
       ports:
         - port: 8000
           httpSupport: true
