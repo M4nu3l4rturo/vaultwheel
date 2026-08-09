@@ -40,7 +40,7 @@ zerops:
     build:
       base: nodejs@20
       buildCommands:
-        - cd frontend && npm install && npm run build && cp public/nginx.conf dist/nginx.conf
+        - cd frontend && npm install && npm run build && cp nginx.conf dist/nginx.conf
       deployFiles:
         - frontend/dist/
 
