@@ -1,9 +1,9 @@
 zerops:
   # ─────────────────────────────────────────────────────────
   # BACKEND — FastAPI (Python 3.12)
-  # Hostname en Zerops: backend
+  # Hostname en Zerops: app
   # ─────────────────────────────────────────────────────────
-  - setup: backend
+  - setup: app
     build:
       base: python@3.12
       buildCommands:
@@ -22,8 +22,11 @@ zerops:
         - port: 8000
           httpSupport: true
       prepareCommands:
+        - rm -f /var/www/uvicorn.py /var/www/sitecustomize.py
         - pip install --upgrade pip
         - pip install -r backend/requirements.txt
+      initCommands:
+        - rm -f /var/www/uvicorn.py /var/www/sitecustomize.py
       start: python3 main.py
       readinessCheck:
         httpGet:
