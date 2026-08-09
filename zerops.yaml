@@ -8,11 +8,11 @@ zerops:
       base: python@3.12
       buildCommands:
         - pip install --upgrade pip
-        - pip install -r backend/requirements.txt
+        - pip install --break-system-packages --target /usr/lib/python3/dist-packages -r backend/requirements.txt
       deployFiles:
         - backend
-        - uvicorn
         - zerops.yaml
+        - /usr/lib/python3/dist-packages
 
     run:
       base: python@3.12
