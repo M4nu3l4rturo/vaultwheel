@@ -11,6 +11,7 @@ zerops:
         - pip install -r backend/requirements.txt
       deployFiles:
         - backend
+        - main.py
         - zerops.yaml
       cache:
         - ~/.cache/pip~backend/requirements.txt
