@@ -1,17 +1,3 @@
-# zerops-import.yaml
-# Importa los servicios de VaultWheel en tu proyecto de Zerops
-# Uso: zcli project service-import zerops-import.yaml --projectId <PROJECT_ID>
-#
-# Después de importar, configura estas env vars en el dashboard:
-#   Servicio 'backend':
-#     SECRET_KEY=<genera con: python -c "import secrets; print(secrets.token_hex(32))">
-#     DEMO_MODE=true
-#     POLYGON_RPC_URL=https://rpc-amoy.polygon.technology
-#     CONTRACT_ADDRESS=  (opcional, para NFTs reales)
-#     PLATFORM_PRIVATE_KEY=  (opcional)
-#
-# DATABASE_URL se construye automáticamente desde las vars de 'db'
-
 services:
   - hostname: db
     type: postgresql@16
@@ -19,8 +5,8 @@ services:
 
   - hostname: backend
     type: python@3.12
-    buildFromGit: https://github.com/...  # Reemplaza con tu repo
+    buildFromGit: https://github.com/M4nu3l4rturo/vaultwheel.git
 
   - hostname: frontend
     type: nginx@1.22
-    buildFromGit: https://github.com/...  # Reemplaza con tu repo
+    buildFromGit: https://github.com/M4nu3l4rturo/vaultwheel.git

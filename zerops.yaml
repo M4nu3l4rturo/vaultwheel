@@ -1,14 +1,7 @@
-# zerops.yaml — VaultWheel Monorepo
-# Proyecto Zerops: python-hello-world-small-prod
-# Servicios existentes: app (Python) | db (PostgreSQL)
-
 zerops:
-  # ─────────────────────────────────────────────────────────
   # BACKEND — FastAPI (Python 3.12)
   # Hostname en Zerops: app
-  # ─────────────────────────────────────────────────────────
-  - setup: app
-    build:
+  - setup: app    build:
       base: python@3.12
       buildCommands:
         - pip install --upgrade pip
@@ -33,10 +26,8 @@ zerops:
         DEMO_MODE: "true"
         POLYGON_RPC_URL: "https://rpc-amoy.polygon.technology"
 
-  # ─────────────────────────────────────────────────────────
-  # FRONTEND — React/Vite → Nginx Static
+  # FRONTEND — React/Vite - Nginx Static
   # Hostname en Zerops: frontend
-  # ─────────────────────────────────────────────────────────
   - setup: frontend
     build:
       base: nodejs@20

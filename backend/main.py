@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from .core.database import engine, SessionLocal
-from .models import *  # Import all models to create tables
+from .models import *
 from .core.database import Base
 from .routes import auth, vehicles, tokens, transactions, kyc, admin
 from .services.seed import seed_database
@@ -13,11 +13,9 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create all tables
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables created")
     
-    # Seed database
     db = SessionLocal()
     try:
         seed_database(db)

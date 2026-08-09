@@ -1,6 +1,3 @@
-// Web3 service — ethers.js integration for MetaMask
-// In demo mode, users can view their NFTs via the platform wallet
-
 export const isMetaMaskInstalled = () => {
   return typeof window.ethereum !== 'undefined'
 }
