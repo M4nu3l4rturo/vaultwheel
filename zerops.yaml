@@ -11,6 +11,7 @@ zerops:
         - pip install -r backend/requirements.txt
       deployFiles:
         - backend
+        - main.py
       cache:
         - ~/.cache/pip~backend/requirements.txt
 
@@ -19,7 +20,7 @@ zerops:
       ports:
         - port: 8000
           httpSupport: true
-      start: cd /var/www/backend && python3 app_server.py
+      start: python3 main.py
       envVariables:
         DATABASE_URL: "postgresql://vaultwheel:vaultwheel@db:5432/vaultwheel"
         DEMO_MODE: "true"

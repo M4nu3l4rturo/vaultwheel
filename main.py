@@ -1,21 +1,20 @@
+"""
+VaultWheel Backend - Root entrypoint for Zerops
+This file is the run.start entrypoint: python3 main.py
+It runs from /var/www/ and imports from /var/www/backend/
+"""
 import sys
 import os
-import builtins
-from contextlib import asynccontextmanager
 
-builtins.asynccontextmanager = asynccontextmanager
-
-base_dir = os.path.dirname(os.path.abspath(__file__))
-backend_dir = os.path.join(base_dir, 'backend')
-
-if base_dir not in sys.path:
-    sys.path.insert(0, base_dir)
+# Add /var/www/backend to path so imports work
+backend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend")
 if backend_dir not in sys.path:
     sys.path.insert(0, backend_dir)
 
-from backend.app_server import app
+# Now import and run the app
+from app_server import app
 import uvicorn
 
 if __name__ == '__main__':
-    print("Starting VaultWheel Backend on 0.0.0.0:8000...")
+    print("VaultWheel API starting on 0.0.0.0:8000 ...")
     uvicorn.run(app, host="0.0.0.0", port=8000)
