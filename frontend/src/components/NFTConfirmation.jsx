@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { getPolygonAmoyExplorerUrl } from '../services/web3'
 
 export default function NFTConfirmation({ tx, vehicle, onClose }) {
-  const isDemoTx = tx.tx_hash.startsWith('0x000')
+  const isDemoTx = !tx.tx_hash || tx.tx_hash.startsWith('0x000')
 
   return (
     <div className="p-8 text-center space-y-6">
@@ -27,7 +27,9 @@ export default function NFTConfirmation({ tx, vehicle, onClose }) {
       <div className="bg-vault-dark rounded-xl p-4 border border-vault-border text-left space-y-3">
         <div>
           <span className="text-xs text-vault-text block">Transaction Hash</span>
-          {isDemoTx ? (
+          {!tx.tx_hash ? (
+            <span className="text-sm font-mono text-vault-text animate-pulse block">Processing Minting...</span>
+          ) : isDemoTx ? (
             <span className="text-sm font-mono text-vault-gold truncate block">{tx.tx_hash}</span>
           ) : (
             <a 

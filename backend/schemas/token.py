@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from decimal import Decimal
 from datetime import datetime
 from typing import Optional
+from .vehicle import VehicleResponse
 
 class TokenResponse(BaseModel):
     id: int
@@ -17,5 +18,7 @@ class TokenResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 class VehicleWithToken(BaseModel):
-    vehicle: dict
+    vehicle: VehicleResponse
     token: Optional[TokenResponse] = None
+    
+    model_config = {"from_attributes": True}

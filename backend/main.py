@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from .core.database import engine, SessionLocal
 from .models import *
 from .core.database import Base
-from .routes import auth, vehicles, tokens, transactions, kyc, admin
+from .routes import auth, vehicles, tokens, transactions, kyc, admin, holdings
 from .services.seed import seed_database
 import logging
 
@@ -46,6 +46,7 @@ app.include_router(tokens.router)
 app.include_router(transactions.router)
 app.include_router(kyc.router)
 app.include_router(admin.router)
+app.include_router(holdings.router)
 
 @app.get("/health")
 def health():
