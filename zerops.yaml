@@ -11,8 +11,6 @@ zerops:
         - pip install -r backend/requirements.txt
       deployFiles:
         - backend
-        - main.py
-        - uvicorn.py
         - zerops.yaml
       cache:
         - ~/.cache/pip~backend/requirements.txt
@@ -25,7 +23,7 @@ zerops:
       prepareCommands:
         - pip install --upgrade pip
         - pip install -r backend/requirements.txt
-      start: python3 main.py
+      start: python3 backend/main.py
       readinessCheck:
         httpGet:
           port: 8000

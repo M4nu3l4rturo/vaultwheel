@@ -1,21 +1,25 @@
-import sys, os
+import sys
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+import uvicorn
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+base_dir = os.path.dirname(os.path.abspath(__file__))
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
 
 try:
-    from .core.database import engine, SessionLocal, Base
-    from .models import *
-    from .routes import auth, vehicles, tokens, transactions, kyc, admin, holdings, payments, market
-    from .services.seed import seed_database
-except (ImportError, ValueError):
     from core.database import engine, SessionLocal, Base
     from models import *
     from routes import auth, vehicles, tokens, transactions, kyc, admin, holdings, payments, market
     from services.seed import seed_database
+except (ImportError, ValueError):
+    from .core.database import engine, SessionLocal, Base
+    from .models import *
+    from .routes import auth, vehicles, tokens, transactions, kyc, admin, holdings, payments, market
+    from .services.seed import seed_database
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -32,7 +36,7 @@ async def lifespan(app: FastAPI):
         finally:
             db.close()
     except Exception as e:
-        logger.error(f"Lifespan setup error (DB fallback): {e}")
+        logger.error(f"Lifespan setup error: {e}")
     
     yield
     logger.info("Shutdown")
@@ -65,3 +69,7 @@ app.include_router(market.router)
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "VaultWheel API v1.0.0"}
+
+if __name__ == '__main__':
+    print("Starting VaultWheel Backend on 0.0.0.0:8000...")
+    uvicorn.run(app, host="0.0.0.0", port=8000)
