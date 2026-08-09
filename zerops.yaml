@@ -1,9 +1,9 @@
 zerops:
   # ─────────────────────────────────────────────────────────
   # BACKEND — FastAPI (Python 3.12)
-  # Hostname en Zerops: app
+  # Hostname en Zerops: backend
   # ─────────────────────────────────────────────────────────
-  - setup: app
+  - setup: backend
     build:
       base: python@3.12
       buildCommands:
