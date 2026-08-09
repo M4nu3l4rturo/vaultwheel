@@ -13,7 +13,7 @@ if base_dir not in sys.path:
 if backend_dir not in sys.path:
     sys.path.insert(0, backend_dir)
 
-from backend.main import app
+from backend.app_server import app
 import uvicorn
 
 if __name__ == '__main__':
