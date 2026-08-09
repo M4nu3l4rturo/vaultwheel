@@ -1,18 +1,17 @@
 """
 VaultWheel Backend - Root entrypoint for Zerops
-This file is the run.start entrypoint: python3 main.py
-It runs from /var/www/ and imports from /var/www/backend/
+Runs from /var/www/ with: python3 main.py
 """
 import sys
 import os
 
-# Add /var/www/backend to path so imports work
-backend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend")
-if backend_dir not in sys.path:
-    sys.path.insert(0, backend_dir)
+# Add /var/www to sys.path so 'backend' is importable as a package
+# This preserves relative imports inside backend (e.g. 'from ..core.database import Base')
+www_dir = os.path.dirname(os.path.abspath(__file__))  # /var/www
+if www_dir not in sys.path:
+    sys.path.insert(0, www_dir)
 
-# Now import and run the app
-from app_server import app
+from backend.app_server import app
 import uvicorn
 
 if __name__ == '__main__':
