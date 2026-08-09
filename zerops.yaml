@@ -12,6 +12,7 @@ zerops:
       deployFiles:
         - backend
         - vendor
+        - sitecustomize.py
         - zerops.yaml
       cache:
         - ~/.cache/pip~backend/requirements.txt
@@ -21,7 +22,7 @@ zerops:
       ports:
         - port: 8000
           httpSupport: true
-      start: PYTHONPATH=/var/www/vendor:/var/www/backend:/var/www python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
+      start: python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
       readinessCheck:
         httpGet:
           port: 8000
@@ -29,7 +30,6 @@ zerops:
       envVariables:
         DEMO_MODE: "true"
         POLYGON_RPC_URL: "https://rpc-amoy.polygon.technology"
-        PYTHONPATH: "/var/www/vendor:/var/www/backend:/var/www"
 
   # ─────────────────────────────────────────────────────────
   # FRONTEND — React/Vite → Nginx Static
