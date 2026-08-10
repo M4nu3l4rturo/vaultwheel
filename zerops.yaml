@@ -45,6 +45,9 @@ zerops:
 
     run:
       base: nginx@1.22
+      prepareCommands:
+        - mkdir -p /var/lib/nginx/tmp /var/lib/nginx/logs /tmp/client_temp /tmp/proxy_temp_path
+        - chmod -R 777 /var/lib/nginx /tmp
       ports:
         - port: 80
           httpSupport: true
