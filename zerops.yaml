@@ -50,4 +50,4 @@ zerops:
       ports:
         - port: 80
           httpSupport: true
-      start: nginx -g 'daemon off;' -c /var/www/nginx.conf
+      start: nginx -g 'daemon off;'
