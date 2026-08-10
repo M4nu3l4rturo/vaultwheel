@@ -40,14 +40,9 @@ zerops:
     build:
       base: nodejs@20
       buildCommands:
-        - cd frontend && npm install && npm run build && cp nginx.conf dist/nginx.conf
+        - cd frontend && npm install && npm run build
       deployFiles:
         - frontend/dist
-        - frontend/nginx.conf
 
     run:
-      base: nginx@1.22
-      ports:
-        - port: 80
-          httpSupport: true
-      start: nginx -g 'daemon off;'
+      base: static
