@@ -31,23 +31,16 @@ zerops:
         PYTHONDONTWRITEBYTECODE: "1"
 
   # ─────────────────────────────────────────────────────────
-  # FRONTEND — React/Vite → Nginx Static
+  # FRONTEND — React/Vite → Static Web
   # Hostname en Zerops: frontend
   # ─────────────────────────────────────────────────────────
   - setup: frontend
     build:
       base: nodejs@20
       buildCommands:
-        - cd frontend && npm install && npm run build && cp nginx.conf dist/nginx.conf
+        - cd frontend && npm install && npm run build
       deployFiles:
         - frontend/dist/~
 
     run:
-      base: nginx@1.22
-      prepareCommands:
-        - mkdir -p /var/lib/nginx/tmp /var/lib/nginx/logs /tmp/client_temp /tmp/proxy_temp_path
-        - chmod -R 777 /var/lib/nginx /tmp
-      ports:
-        - port: 80
-          httpSupport: true
-      start: nginx -g 'daemon off;' -c /var/www/nginx.conf
+      base: static
