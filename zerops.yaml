@@ -18,8 +18,6 @@ zerops:
     run:
       base: python@3.12
       prepareCommands:
-        # run.prepareCommands executes before deployFiles are placed in /var/www/
-        # so we install packages directly (no requirements.txt available yet)
         - pip install --upgrade pip
         - pip install fastapi==0.115.0 "uvicorn[standard]==0.32.0" sqlalchemy==2.0.36 psycopg2-binary==2.9.10 pydantic==2.10.3 pydantic-settings==2.6.1 "python-jose[cryptography]==3.3.0" "passlib[bcrypt]==1.7.4" bcrypt==4.0.1 python-multipart==0.0.12 web3==7.6.0 httpx==0.27.2 alembic==1.14.0 email-validator==2.3.0
       ports:
@@ -43,6 +41,11 @@ zerops:
         - cd frontend && npm install && npm run build
       deployFiles:
         - frontend/dist
+        - frontend/nginx.conf
 
     run:
-      base: static
+      base: nginx@1.22
+      ports:
+        - port: 80
+          httpSupport: true
+      start: nginx -g 'daemon off;' -c /var/www/nginx.conf
