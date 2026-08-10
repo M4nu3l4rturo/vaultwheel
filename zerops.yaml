@@ -40,8 +40,8 @@ zerops:
       buildCommands:
         - cd frontend && npm install && npm run build && cp nginx.conf dist/nginx.conf
       deployFiles:
-        - frontend/dist/~*
-        - frontend/dist/~assets
+        - frontend/dist/
+        - frontend/nginx.conf
 
     run:
       base: nginx@1.22
