@@ -40,7 +40,7 @@ zerops:
       buildCommands:
         - cd frontend && npm install && npm run build
       deployFiles:
-        - frontend/dist/~
+        - frontend/dist
 
     run:
       base: static
