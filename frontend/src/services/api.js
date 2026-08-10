@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const BASE_URL = import.meta.env.VITE_API_URL || ''
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://backend-2b47-8000.prg1.zerops.app'
 
 export const api = axios.create({
   baseURL: BASE_URL,
